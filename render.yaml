@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: crypto-portfolio
+    runtime: docker
+    plan: free
+    region: frankfurt
+    healthCheckPath: /_stcore/health
+    autoDeploy: true
+    envVars:
+      - key: TRADE_MODE
+        value: paper
+      - key: NEWS_FRESHNESS_MINUTES
+        value: "1440"
+      - key: REPO_URL
+        sync: false
