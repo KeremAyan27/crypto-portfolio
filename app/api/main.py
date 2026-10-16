@@ -19,6 +19,8 @@ from app.services.price_source import (
     BinancePublicPriceSource,
     CoinGeckoPriceSource,
     FallbackPriceSource,
+    KrakenPriceSource,
+    OKXPriceSource,
     PriceUnavailable,
     StaticPriceSource,
 )
@@ -46,7 +48,7 @@ def build_container(
     settings = settings or get_settings()
     if exchange is None:
         prices = FallbackPriceSource(
-            [BinancePublicPriceSource(), CoinGeckoPriceSource(), StaticPriceSource()],
+            [BinancePublicPriceSource(), OKXPriceSource(), KrakenPriceSource(), CoinGeckoPriceSource(), StaticPriceSource()],
             cache_seconds=settings.price_cache_seconds,
         )
         if settings.trade_mode == "testnet" and settings.binance_api_key:

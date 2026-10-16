@@ -164,3 +164,45 @@ def test_sessions_are_isolated():
     svc = TradeService(PaperExchange(StaticPriceSource(PRICES)), BalanceValidator())
     svc.place_order(a, "BTC", OrderDirection.BUY, 0.01)
     assert b.user.get_portfolio().cash_balance == 10_000
+
+
+class _FakeResp:
+    def __init__(self, payload):
+        self._payload = payload
+
+    def raise_for_status(self):
+        pass
+
+    def json(self):
+        return self._payload
+
+
+class _FakeSession:
+    def __init__(self, payload):
+        self._payload = payload
+
+    def get(self, *args, **kwargs):
+        return _FakeResp(self._payload)
+
+
+def test_okx_parser():
+    from app.services.price_source import OKXPriceSource
+
+    payload = {"code": "0", "data": [{"instId": "BTC-USDT", "last": "81655.4"}, {"instId": "BTC-USDC", "last": "1"}]}
+    assert OKXPriceSource(_FakeSession(payload)).fetch_prices(["BTC", "ETH"]) == {"BTC": 81655.4}
+
+
+def test_kraken_parser_maps_xbt_and_xdg():
+    from app.services.price_source import KrakenPriceSource
+
+    payload = {"error": [], "result": {"XBTUSDT": {"c": ["81651.6", "0.1"]}, "XDGUSDT": {"c": ["0.0808", "5"]}}}
+    assert KrakenPriceSource(_FakeSession(payload)).fetch_prices(["BTC", "DOGE"]) == {"BTC": 81651.6, "DOGE": 0.0808}
+
+
+def test_fallback_fills_gaps_from_next_source():
+    partial = StaticPriceSource({"BTC": 1.0})
+    partial.name = "Partial"
+    full = StaticPriceSource({"BTC": 2.0, "ETH": 3.0})
+    src = FallbackPriceSource([partial, full], cache_seconds=0)
+    assert src.fetch_prices(["BTC", "ETH"]) == {"BTC": 1.0, "ETH": 3.0}
+    assert src.name == "Partial + Static reference prices"

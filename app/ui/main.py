@@ -146,7 +146,7 @@ with st.sidebar:
     if REPO_URL:
         st.markdown(f"[Source code on GitHub]({REPO_URL})")
     st.divider()
-    if st.button("Reset demo portfolio", use_container_width=True, disabled=not backend_ok):
+    if st.button("Reset demo portfolio", width="stretch", disabled=not backend_ok):
         try:
             st.session_state.session_id = api("POST", "/session/reset")["session_id"]
             st.session_state.pop("selected", None)
@@ -198,7 +198,7 @@ def portfolio_section() -> None:
     st.dataframe(
         pd.DataFrame(rows),
         hide_index=True,
-        use_container_width=True,
+        width="stretch",
         column_config={
             "Quantity": st.column_config.NumberColumn(format="%.6f"),
             "Avg cost": st.column_config.NumberColumn(format="dollar"),
@@ -240,7 +240,7 @@ with left:
                 ]
             ),
             hide_index=True,
-            use_container_width=True,
+            width="stretch",
         )
     else:
         st.caption("No trades yet. Pick a headline in Quick Trade to place one.")
@@ -309,7 +309,7 @@ with right:
             quantity = c2.number_input("Quantity", min_value=0.000001, value=default_qty, format="%.6f")
             est = quantity * price if price else None
             st.caption(f"{s['symbol']} price {md_usd(price)} · estimated total {md_usd(est)}")
-            if st.form_submit_button("Validate and submit", type="primary", use_container_width=True):
+            if st.form_submit_button("Validate and submit", type="primary", width="stretch"):
                 submit_trade(s["symbol"], direction, quantity, ev["event_id"])
                 st.rerun()
         st.caption("The balance check runs before the order is sent. Fills are simulated at the live price.")
@@ -320,7 +320,7 @@ with right:
             symbol = c1.selectbox("Symbol", ["BTC", "ETH", "SOL", "XRP", "BNB", "ADA", "DOGE", "AVAX", "LINK", "DOT"])
             side = c2.selectbox("Side", ["BUY", "SELL"])
             qty = c3.number_input("Quantity", min_value=0.000001, value=0.01, format="%.6f")
-            if st.form_submit_button("Submit", use_container_width=True):
+            if st.form_submit_button("Submit", width="stretch"):
                 submit_trade(symbol, side, qty, None)
                 st.rerun()
 
