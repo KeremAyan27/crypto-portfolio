@@ -2,8 +2,6 @@
 
 A crypto portfolio tracker that reacts to news. When a headline mentions a coin in your portfolio, the app shows a Quick Trade card so you can buy or sell that coin in one step. Prices are live market prices. Orders are simulated.
 
-I first built this as the working prototype for our MIS 326 Object-Oriented Modeling and Development term project at Boğaziçi University (Spring 2026). I did the project and wrote the code; teammates helped with some of the diagrams and the presentation. This repository is a rebuild of that prototype as a live web app, keeping the same class design and flow from the project report. Both versions were built with AI coding assistance (Claude Code).
-
 Live demo: https://crypto-portfolio-o7lx.onrender.com (free hosting tier, the first load after a quiet period can take up to a minute)
 
 Here is how a trade happens. The news source fetches headlines from the CoinTelegraph RSS feed (a public list of the latest articles) and turns each one into a NewsEvent, which extracts the coin symbols it mentions. Every visitor has a QuickTradeObserver registered with the news source; the observer keeps an event only if it mentions a coin the visitor holds and is not older than the freshness window. The visitor picks a card, sets a quantity, and submits. The BalanceValidator checks cash or holdings first. If the check passes, the order goes to the exchange service, the portfolio is updated, and the TradeOrder moves from PENDING to VALIDATED to EXECUTED. If it fails, the order is marked REJECTED with the reason, and nothing changes.
